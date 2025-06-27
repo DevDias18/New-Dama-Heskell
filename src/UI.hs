@@ -16,15 +16,17 @@ import Control.Concurrent (threadDelay)
 -- Mostra o tabuleiro
 displayBoard :: Board -> IO ()
 displayBoard board = do
-    putStrLn "  0 1 2 3 4 5 6 7"
-    mapM_ (\(i, row) -> putStrLn (show i ++ " " ++ showRow row)) (zip [0..7] board)
-    where
-        showRow = unwords . map showCell
-        showCell Nothing = "."
-        showCell (Just (Regular White)) = "w"
-        showCell (Just (Regular Black)) = "b"
-        showCell (Just (King White)) = "W"
-        showCell (Just (King Black)) = "B"
+    putStrLn "   A B C D E F G H"         -- cabeçalho das colunas
+    mapM_ (\(i, row) ->
+        putStrLn (show (8 - i) ++ " " ++ showRow row)
+      ) (zip [0..7] board)
+  where
+    showRow = unwords . map showCell
+    showCell Nothing                  = "."
+    showCell (Just (Regular White))   = "w"
+    showCell (Just (Regular Black))   = "b"
+    showCell (Just (King    White))   = "W"
+    showCell (Just (King    Black))   = "B"
 
 -- Lê movimento do jogador
 getMove :: IO Move
