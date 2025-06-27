@@ -12,11 +12,12 @@ import AI (chooseMove)
 import System.IO
 import Control.Monad (when)
 import Control.Concurrent (threadDelay)
+import Data.Char (toUpper, isDigit, ord)
 
 -- Mostra o tabuleiro
 displayBoard :: Board -> IO ()
 displayBoard board = do
-    putStrLn "   A B C D E F G H"         -- cabeçalho das colunas
+    putStrLn "  A B C D E F G H"           -- cabeçalho das colunas
     mapM_ (\(i, row) ->
         putStrLn (show (8 - i) ++ " " ++ showRow row)
       ) (zip [0..7] board)
@@ -29,19 +30,32 @@ displayBoard board = do
     showCell (Just (King    Black))   = "B"
 
 -- Lê movimento do jogador
+parseCoord :: String -> Maybe Position
+parseCoord s
+  | length s < 2 = Nothing
+  | otherwise =
+      let (rowStr, [colCh]) = splitAt (length s - 1) s
+      in  if all isDigit rowStr
+             then let row = read rowStr
+                      col = ord (toUpper colCh) - ord 'A'
+                  in if row >= 1 && row <= 8 && col >= 0 && col <= 7
+                        then Just (8 - row, col)   -- 8→0, 1→7
+                        else Nothing
+             else Nothing
+
 getMove :: IO Move
 getMove = do
-    putStr "Digite movimento (ex: '2 3 3 4'): "
+    putStr "Digite movimento (ex: '3A 4B'): "
     hFlush stdout
-    input <- getLine
-    let ws = words input
-    if length ws /= 4
-        then do
-            putStrLn "Entrada inválida! Use o formato: linha coluna linha coluna."
+    ws <- words <$> getLine
+    case ws of
+        [srcStr, dstStr]
+            | Just src <- parseCoord srcStr
+            , Just dst <- parseCoord dstStr  -> return (Move src dst)
+        _ -> do
+            putStrLn "Entrada inválida! Use o formato linhaColuna linhaColuna (ex: 3A 4B)."
             getMove
-        else do
-            let [fromRow, fromCol, toRow, toCol] = map read ws
-            return $ Move (fromRow, fromCol) (toRow, toCol)
+
 
 -- Loop principal do jogo (Jogador vs Jogador)
 gameLoop :: GameState -> IO ()
