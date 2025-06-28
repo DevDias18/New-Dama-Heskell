@@ -10,6 +10,7 @@ module Main where
 import UI
 import GameLogic (initialGameState)
 import Types
+import System.IO (hFlush, stdout)
 import Data.Char (toLower)
 import Control.Monad (when)
 
@@ -18,24 +19,22 @@ main = mainLoop
 
 mainLoop :: IO ()
 mainLoop = do
-    putStrLn "Modo de jogo:"
-    putStrLn "1 - Jogador vs Jogador"
-    putStrLn "2 - Jogador vs Computador"
-    putStrLn "3 - Computador vs Computador"
-    putStr "Escolha o modo: "
-    mode <- getLine
+    putStrLn "Quem joga com as peças White?  (1) Humano  (2) Robô : "
+    hFlush stdout
+    whiteChoice <- getLine
 
-    putStr "Quem começa? (White ou Black): "
-    starter <- getLine
-    let s = map toLower starter
-    let color = if s == "white" then White else Black
-    let initial = initialGameState { currentPlayer = color }
+    putStrLn "Quem joga com as peças Black?  (1) Humano  (2) Robô : "
+    hFlush stdout
+    blackChoice <- getLine
 
-    case mode of
-        "1" -> gameLoop initial
-        "2" -> playerVsBotLoop initial
-        "3" -> botVsBotLoop initial
-        _   -> putStrLn "Modo inválido"
+    let initial = initialGameState  -- Peças brancas sempre começam
+
+    case (whiteChoice, blackChoice) of
+        ("1", "1") -> gameLoop initial                              -- Humano vs Humano
+        ("1", "2") -> playerVsBotLoop initial                       -- Humano (White) vs Bot (Black)
+        ("2","1") -> botVsHumanLoop initial                         -- Bot (White) vs Humano (Black)
+        ("2", "2") -> botVsBotLoop initial                          -- Bot vs Bot
+        _ -> putStrLn "Opção inválida. Reinicie e escolha 1 ou 2."
 
     putStrLn "Deseja jogar novamente? (s/n)"
     resp <- getLine

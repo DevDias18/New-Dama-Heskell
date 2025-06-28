@@ -8,6 +8,7 @@
 module UI (
     gameLoop,
     playerVsBotLoop,
+    botVsHumanLoop,
     botVsBotLoop
 ) where
 
@@ -118,3 +119,28 @@ botVsBotLoop state = do
             putStrLn $ "Bot escolheu: " ++ show move
             let newState = processMove state move
             botVsBotLoop newState
+
+-- Bot joga com as peças brancas; humano joga com as pretas
+botVsHumanLoop :: GameState -> IO ()
+botVsHumanLoop state = do
+    displayBoard (board state)
+    if gameOver state
+        then putStrLn $ "Fim de jogo! Vencedor: " ++ show (winner state)
+        else do
+            putStrLn $ "Vez de: " ++ show (currentPlayer state)
+            if currentPlayer state == White
+                then do                               -- turno do Bot
+                    putStrLn "Vez da máquina..."
+                    threadDelay 1000000
+                    let move = chooseMove state
+                    putStrLn $ "Máquina escolheu: " ++ show move
+                    let newState = processMove state move
+                    botVsHumanLoop newState
+                else do                               -- turno do Humano (peças pretas)
+                    move <- getMove
+                    let newState = processMove state move
+                    if board newState == board state
+                       then do
+                           putStrLn "Movimento inválido! Tente novamente."
+                           botVsHumanLoop state
+                       else botVsHumanLoop newState
