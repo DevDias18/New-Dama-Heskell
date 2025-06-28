@@ -25,7 +25,11 @@ data GameState = GameState
     } deriving (Show)
 
 data Move = Move Position Position
-    deriving (Eq, Show)
+    deriving (Eq)
 
+instance Show Move where
+    show (Move (fr, fc) (tr, tc)) =
+        let showPos (r, c) = show (8 - r) ++ [toEnum (c + fromEnum 'A')]
+        in showPos (fr, fc) ++ " " ++ showPos (tr, tc)
 data Direction = NorthEast | NorthWest | SouthEast | SouthWest
     deriving (Eq, Show)
