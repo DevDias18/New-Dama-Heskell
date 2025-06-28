@@ -1,3 +1,10 @@
+--------------------------- Autores de Trabalho ------------------------------------
+--Nome: Luana Lauschner Avilez Vilarinho
+--Matrícula: 202265062AC
+--Nome: Geovanni Moreira Dias
+--Matrícula: 202365171A
+------------------------------------------------------------------------------------
+
 module GameLogic where
 
 import Types
